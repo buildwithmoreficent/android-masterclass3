@@ -1,4 +1,27 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        appcompat_version = "1.4.2"
+        constraintlayout_version = "2.1.4"
+        core_ktx_version = "1.8.0"
+        kotlin_version = "1.7.0"
+        material_version = "1.7.0-alpha02"
+        nav_version = '2.4.2'
+        lifecycle_version = "2.4.0"
+        datastore_version = "1.0.0"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
 plugins {
     id 'com.android.application' version '7.2.2' apply false
     id 'com.android.library' version '7.2.2' apply false
