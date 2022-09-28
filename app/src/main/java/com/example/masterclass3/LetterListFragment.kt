@@ -9,17 +9,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.masterclass3.data.SettingDataStore
 import com.example.masterclass3.databinding.FragmentLetterListBinding
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 /**
  * Entry fragment for the app. Displays a [RecyclerView] of letters.
  */
 class LetterListFragment : Fragment() {
     private var _binding: FragmentLetterListBinding? = null
-
+     lateinit var settingDataStore: SettingDataStore
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -46,9 +50,17 @@ class LetterListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = binding.recyclerView
+        settingDataStore = SettingDataStore(requireContext())
         // Sets the LayoutManager of the recyclerview
         // On the first run of the app, it will be LinearLayoutManager
-        chooseLayout()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            settingDataStore.orientation.collectLatest { value->
+                isLinearLayoutManager = value
+                chooseLayout()
+            }
+        }
+
     }
 
     /**
@@ -61,7 +73,6 @@ class LetterListFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.layout_menu, menu)
-
         val layoutButton = menu.findItem(R.id.action_switch_layout)
         setIcon(layoutButton)
     }
@@ -99,8 +110,13 @@ class LetterListFragment : Fragment() {
             R.id.action_switch_layout -> {
                 // Sets isLinearLayoutManager (a Boolean) to the opposite value
                 isLinearLayoutManager = !isLinearLayoutManager
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    settingDataStore.saveOrientation(isLinearLayoutManager)
+                }
+
+
                 // Sets layout and icon
-                chooseLayout()
                 setIcon(item)
 
                 return true
